@@ -7,7 +7,7 @@ import { Option } from "../types/option";
 
 type Props<T extends FieldValues> = {
   name: Path<T>;
-  options: Option[];
+  options?: Option[];
   label: string;
 };
 
@@ -24,12 +24,12 @@ const RHFAutocomplete = <T extends FieldValues>({
       name={name}
       render={({ field: { value, onChange, ref }, fieldState: { error } }) => (
         <Autocomplete
-          options={options}
+          options={options || []}
           value={value.map((id: string) =>
-            options.find((item) => item.id === id)
+            options?.find((item) => item.id === id)
           )}
           getOptionLabel={(option) =>
-            options.find((item) => item.id === option.id)?.label ?? ""
+            options?.find((item) => item.id === option.id)?.label ?? ""
           }
           isOptionEqualToValue={(option, newValue) => option.id === newValue.id}
           onChange={(_, newValue) => {
@@ -47,19 +47,24 @@ const RHFAutocomplete = <T extends FieldValues>({
               label={label}
             />
           )}
-          renderOption={(props, option, { selected }) => (
-            <Box
-              component="li"
-              {...props}
-            >
-              <Checkbox
-                icon={<CheckBoxOutlineBlankIcon />}
-                checkedIcon={<CheckBoxIcon />}
-                checked={selected}
-              />
-              {option.label}
-            </Box>
-          )}
+          renderOption={(props, option, { selected }) => {
+            const { key, ...rest } = props;
+
+            return (
+              <Box
+                component="li"
+                key={key}
+                {...rest}
+              >
+                <Checkbox
+                  icon={<CheckBoxOutlineBlankIcon />}
+                  checkedIcon={<CheckBoxIcon />}
+                  checked={selected}
+                />
+                {option.label}
+              </Box>
+            );
+          }}
         />
       )}
     />
